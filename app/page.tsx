@@ -1,3 +1,4 @@
+import ChileFocusSection from "@/components/ChileFocusSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/layout/Navbar";
@@ -13,6 +14,7 @@ export default function Home() {
       <ProblemSection />
       <SolutionSection />
       <FeaturesSection />
+      <ChileFocusSection/>
     </div>
   );
 }
