@@ -1,3 +1,4 @@
+import FeaturesSection from "@/components/FeaturesSection";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/layout/Navbar";
 import ProblemSection from "@/components/ProblemSection";
@@ -10,7 +11,8 @@ export default function Home() {
       <Navbar />
       <Hero />
       <ProblemSection />
-      <SolutionSection/>
+      <SolutionSection />
+      <FeaturesSection />
     </div>
   );
 }
