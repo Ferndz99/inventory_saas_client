@@ -1,5 +1,6 @@
 import ChileFocusSection from "@/components/ChileFocusSection";
 import FeaturesSection from "@/components/FeaturesSection";
+import FinalCtaSection from "@/components/FinalCtaSection";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
 import Navbar from "@/components/layout/Navbar";
@@ -17,6 +18,7 @@ export default function Home() {
       <FeaturesSection />
       <ChileFocusSection/>
       <HowItWorks/>
+      <FinalCtaSection/>
     </div>
   );
 }
