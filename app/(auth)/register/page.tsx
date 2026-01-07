@@ -1,55 +1,50 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "@/schemas/auth.schema";
-import * as z from "zod";
+
+import { registerSchema, RegisterFormValues } from "@/schemas/auth.schema";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
-export default function LoginPage() {
-
+export default function RegisterForm() {
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-    } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
+    } = useForm<RegisterFormValues>({
+        resolver: zodResolver(registerSchema),
+    });
 
     const [showPassword, setShowPassword] = useState(false);
 
-    const onSubmit = async (data: LoginFormValues) => {
-        console.log("Login data:", data);
+    const onSubmit = async (data: RegisterFormValues) => {
+        console.log("Register data:", data);
     };
 
     return (
         <>
-            <div className="flex flex-col items-center gap-4 mb-8 text-center">
+            <div className="flex flex-col items-center text-center mb-8">
+                {/* Icon Brand */}
                 <div
-                    className="w-12 h-12 rounded-lg bg-ui-primary/10 border border-ui-pr/20
-                    flex items-center justify-center text-ui-primary"
+                    className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-ui-primary mb-5 shadow-glow"
                 >
-                    <span className="material-symbols-outlined text-[28px]">
+                    <span className="material-symbols-outlined text-[26px]">
                         grid_view
                     </span>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                    <h1 className="text-2xl font-bold tracking-tight">
-                        Welcome Back
-                    </h1>
-                    <p className="text-[#64748b] text-sm">
-                        Enter your credentials to access your account.
-                    </p>
-                </div>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
+                    Crear cuenta
+                </h2>
+
+                <p className="text-slate-500 dark:text-slate-400 text-[15px] leading-relaxed">
+                    Regístrate para comenzar a usar la plataforma
+                </p>
             </div>
-            <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="flex flex-col gap-5"
-            >
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 {/* Email */}
                 <div className="space-y-2">
                     <label
@@ -77,6 +72,7 @@ export default function LoginPage() {
                     )}
                 </div>
 
+
                 {/* Password */}
                 <div className="space-y-2">
                     <label
@@ -91,8 +87,7 @@ export default function LoginPage() {
                             id="password"
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
-                            className="w-full h-11 px-4 pr-12 rounded-lg bg-white
-                border border-gray-200 text-ui-main
+                            className="w-full h-11 px-4 pr-12 rounded-lg  text-ui-main border bg-white border-gray-200
                 placeholder-gray-400 text-sm
                 focus:outline-none focus:ring-2 focus:ring-ui-primary
                 focus:border-ui-primary transition-all duration-200"
@@ -117,17 +112,35 @@ export default function LoginPage() {
                             {errors.password.message}
                         </p>
                     )}
-
-                    <div className="flex justify-end pt-1">
-                        <a
-                            href="#"
-                            className="text-xs font-medium text-ui-secondary
-                hover:text-ui-primary transition-colors"
-                        >
-                            ¿Olvidaste tu contraseña?
-                        </a>
-                    </div>
                 </div>
+
+                {/* Confirm Password */}
+                <div className="space-y-2">
+                    <label
+                        htmlFor="re_password"
+                        className="text-sm font-medium text-ui-main"
+                    >
+                        Confirmar password
+                    </label>
+
+                    <input
+                        id="re_password"
+                        type="password"
+                        placeholder="••••••••"
+                        className="w-full h-11 px-4 rounded-lg bg-white border border-gray-200
+                        text-ui-main placeholder-gray-400 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-ui-primary
+                            focus:border-ui-primary transition-all duration-200"
+                        {...register("re_password")}
+                    />
+
+                    {errors.re_password && (
+                        <p className="text-xs text-red-500">
+                            {errors.re_password.message}
+                        </p>
+                    )}
+                </div>
+
 
                 {/* Submit */}
                 <Button
@@ -157,7 +170,7 @@ export default function LoginPage() {
                 </div>
             </div>
 
-            {/* Social login */}
+            {/* Social buttons */}
             <div className="grid grid-cols-2 gap-3">
                 <Button
                     type="button"
@@ -182,16 +195,16 @@ export default function LoginPage() {
                 </Button>
             </div>
 
-            {/* Register link */}
+            {/* Footer link */}
             <div className="mt-8 text-center">
                 <p className="text-sm text-[#64748b]">
                     ¿No tienes una cuenta?
                     <Link
-                        href="/register"
+                        href="/login"
                         className="font-medium text-ui-primary
                         hover:text-ui-primary-dark transition-colors ml-1"
                     >
-                        Regístrate
+                        Inicia sesión
                     </Link>
                 </p>
             </div>
