@@ -28,7 +28,7 @@ export default function AuthLayout({
             flex flex-col p-6 sm:p-8"
                 >
                     {/* Header */}
-                    <div className="flex flex-col items-center gap-4 mb-8 text-center">
+                    {/* <div className="flex flex-col items-center gap-4 mb-8 text-center">
                         <div
                             className="w-12 h-12 rounded-lg bg-ui-primary/10 border border-ui-pr/20
                     flex items-center justify-center text-ui-primary"
@@ -46,7 +46,7 @@ export default function AuthLayout({
                                 Enter your credentials to access your account.
                             </p>
                         </div>
-                    </div>
+                    </div> */}
 
                     {children}
                 </div>
