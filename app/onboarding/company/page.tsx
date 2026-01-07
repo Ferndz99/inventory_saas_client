@@ -41,7 +41,7 @@ export default function CreateCompanyPage() {
             // TODO: conectar con tu API real
             // await api.post('/onboarding/company', data)
             console.log("company data:", data)
-            // router.push('/onboarding')
+            router.push('/onboarding')
         } catch (error) {
             console.error(error)
         }

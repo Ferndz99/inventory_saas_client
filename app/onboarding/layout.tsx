@@ -16,7 +16,7 @@ export default function OnboardingLayout({ children }: {
                 </div>
             </div>
 
-            <main className="w-full max-w-120 flex flex-col gap-6 animate-fade-in-up mt-0 md:mt-20">
+            <main className="w-full max-w-160 flex flex-col gap-6 animate-fade-in-up mt-0 md:mt-20">
                 {children}
             </main>
 
