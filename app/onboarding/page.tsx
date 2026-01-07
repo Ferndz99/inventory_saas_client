@@ -3,6 +3,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 type OnboardingStep = {
     id: string;
@@ -10,6 +11,7 @@ type OnboardingStep = {
     description: string;
     actionLabel: string;
     completed: boolean;
+    href?: string
 };
 
 const initialSteps: OnboardingStep[] = [
@@ -19,6 +21,7 @@ const initialSteps: OnboardingStep[] = [
         description: "Organiza tus productos creando categorías.",
         actionLabel: "Crear categorías",
         completed: false,
+        href: "/onboarding/categories"
     },
     {
         id: "create_template",
@@ -51,6 +54,8 @@ const initialSteps: OnboardingStep[] = [
 ];
 
 export default function OnboardingPage() {
+
+    const router = useRouter()
 
     const [steps, setSteps] = useState<OnboardingStep[]>(initialSteps);
 
@@ -176,7 +181,13 @@ export default function OnboardingPage() {
 
                                 {/* Action */}
                                 <Button
-                                    onClick={() => toggleStep(index)}
+                                    onClick={() => {
+                                        if (step.href) {
+                                            router.push(step.href)
+                                        } else {
+                                            toggleStep(index)
+                                        }
+                                    }}
                                     variant={
                                         isCompleted
                                             ? "secondary"
