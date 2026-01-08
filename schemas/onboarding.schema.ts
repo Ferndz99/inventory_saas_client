@@ -22,3 +22,15 @@ export const createCategorySchema = z.object({
 });
 
 export type CreateCategoryForm = z.infer<typeof createCategorySchema>;
+
+
+
+export const templateSchema = z.object({
+    name: z
+        .string()
+        .min(2, "El nombre debe tener al menos 2 caracteres"),
+    description: z.string().optional(),
+    is_active: z.boolean().default(true).optional(),
+});
+
+export type TemplateFormValues = z.infer<typeof templateSchema>;

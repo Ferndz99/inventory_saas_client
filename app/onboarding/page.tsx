@@ -29,26 +29,27 @@ const initialSteps: OnboardingStep[] = [
         description: "Define estructuras reutilizables para tus productos.",
         actionLabel: "Crear plantillas",
         completed: false,
+        href: "/onboarding/templates"
+    },
+    {
+        id: "create_atribute",
+        title: "Paso 4 – Crear atributo",
+        description: "Agrega atributos a tus plantillas",
+        actionLabel: "Crear atributo",
+        completed: false,
+    },
+    {
+        id: "asignar_atributo",
+        title: "Paso 5 – Asigna atributos a tus plantillas",
+        description: "Agrega atributos a plantillas",
+        actionLabel: "Asignar atribut",
+        completed: false,
     },
     {
         id: "create_product",
-        title: "Paso 3 – Crear productos",
+        title: "Paso 6 – Crear productos",
         description: "Agrega tus primeros productos al sistema.",
         actionLabel: "Crear producto",
-        completed: false,
-    },
-    {
-        id: "add_stock",
-        title: "Paso 4 – Agregar stock",
-        description: "Registra el stock inicial en tu bodega.",
-        actionLabel: "Agregar stock",
-        completed: false,
-    },
-    {
-        id: "invite_team",
-        title: "Paso 5 – Invitar equipo",
-        description: "Invita a otros usuarios a gestionar el inventario contigo.",
-        actionLabel: "Invitar equipo",
         completed: false,
     },
 ];
