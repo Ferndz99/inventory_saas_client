@@ -34,3 +34,14 @@ export const templateSchema = z.object({
 });
 
 export type TemplateFormValues = z.infer<typeof templateSchema>;
+
+
+export const attributeSchema = z.object({
+    name: z.string().min(2, "El nombre es obligatorio"),
+    data_type: z.enum(["text", "number", "decimal", "boolean", "date"]),
+    unit_of_measure: z.string().optional(),
+    description: z.string().optional(),
+    is_active: z.boolean().default(true).optional(),
+});
+
+export type AttributeFormValues = z.infer<typeof attributeSchema>;
