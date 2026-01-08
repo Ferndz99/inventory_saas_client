@@ -7,22 +7,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/schemas/auth.schema";
 import * as z from "zod";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { buttonBaseClasses, inputBaseClasses } from "@/lib/ui/input-classes";
 
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-const inputBaseClasses = cn(
-    "h-11 px-4 pr-12 rounded-lg",
-    "bg-white! dark:bg-ui-dark!",
-    "border-gray-200! dark:border-gray-700!",
-    "text-ui-main! dark:text-white!",
-    "placeholder:text-gray-400! dark:placeholder:text-slate-500!",
-    "focus:border-ui-primary! focus:ring-2! focus:ring-ui-primary!"
-)
+
 
 export default function LoginPage() {
 
@@ -41,7 +33,7 @@ export default function LoginPage() {
     return (
         <>
             {/* Header */}
-            <div className="flex flex-col items-center text-center gap-5 mb-8">
+            <div className="flex flex-col items-center text-center gap-5 mb-8 cursor-default">
                 <div className="h-14 w-14 rounded-xl bg-ui-primary/10 flex items-center justify-center text-ui-primary border border-ui-primary/20">
                     <span className="material-symbols-outlined text-[28px]">
                         grid_view
@@ -50,10 +42,10 @@ export default function LoginPage() {
 
                 <div className="space-y-1">
                     <h1 className="text-2xl font-bold tracking-tight text-ui-main">
-                        Welcome back
+                        Ingresa a tu cuenta
                     </h1>
                     <p className="text-sm text-ui-secondary">
-                        Enter your credentials to access your account
+                        Ingrese sus credenciales para acceder a su cuenta
                     </p>
                 </div>
             </div>
@@ -108,12 +100,12 @@ export default function LoginPage() {
                     )}
 
                     <div className="flex justify-end pt-1">
-                        <a
+                        <Link
                             href="#"
                             className="text-xs font-medium text-ui-secondary hover:text-ui-primary transition-colors"
                         >
                             ¿Olvidaste tu contraseña?
-                        </a>
+                        </Link>
                     </div>
                 </div>
 
@@ -121,13 +113,7 @@ export default function LoginPage() {
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full h-11 bg-ui-primary hover:bg-ui-primary-dark
-            active:bg-[#0c3ca3] disabled:opacity-60
-            text-white text-sm font-bold rounded-lg
-            transition-all duration-200
-            shadow-[0_4px_14px_rgba(19,91,236,0.25)]
-            hover:shadow-[0_6px_20px_rgba(19,91,236,0.35)]
-            flex items-center justify-center gap-2 mt-1 cursor-pointer"
+                    className={buttonBaseClasses}
                 >
                     {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
                 </Button>
@@ -138,7 +124,7 @@ export default function LoginPage() {
                 <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-200" />
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
+                <div className="relative flex justify-center text-xs uppercase cursor-default">
                     <span className="bg-white px-2 text-ui-secondary">
                         o continuar con
                     </span>
@@ -168,7 +154,7 @@ export default function LoginPage() {
 
             {/* Register */}
             <div className="mt-8 text-center">
-                <p className="text-sm text-ui-secondary">
+                <p className="text-sm text-ui-secondary cursor-default">
                     ¿No tienes una cuenta?
                     <Link
                         href="/register"

@@ -41,27 +41,6 @@ export default function AuthLayout({
             border border-gray-100/50 sm:border-gray-200
             flex flex-col p-6 sm:p-8"
                 >
-                    {/* Header */}
-                    {/* <div className="flex flex-col items-center gap-4 mb-8 text-center">
-                        <div
-                            className="w-12 h-12 rounded-lg bg-ui-primary/10 border border-ui-pr/20
-                    flex items-center justify-center text-ui-primary"
-                        >
-                            <span className="material-symbols-outlined text-[28px]">
-                                grid_view
-                            </span>
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <h1 className="text-2xl font-bold tracking-tight">
-                                Welcome Back
-                            </h1>
-                            <p className="text-[#64748b] text-sm">
-                                Enter your credentials to access your account.
-                            </p>
-                        </div>
-                    </div> */}
-
                     {children}
                 </div>
 
