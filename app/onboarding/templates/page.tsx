@@ -18,6 +18,17 @@ import { Label } from "@/components/ui/label";
 import { TemplateFormValues, templateSchema } from "@/schemas/onboarding.schema";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+
+const templates = [
+    {
+        id: "1",
+        name: "template base"
+    }
+]
+
 
 export default function CreateTemplatePage() {
 
@@ -39,6 +50,9 @@ export default function CreateTemplatePage() {
     });
 
     const isActive = watch("is_active");
+
+    const [mode, setMode] = useState<"create" | "select">("create")
+    const [selectedTemplate, setSelectedTemplate] = useState<string>("")
 
     const onSubmit = async (data: TemplateFormValues) => {
         console.log("Template data:", data);
@@ -71,10 +85,40 @@ export default function CreateTemplatePage() {
                             </div>
                         </div>
 
+                        <div className="grid grid-cols-2 gap-2">
+                            <Button
+                                type="button"
+                                onClick={() => setMode("create")}
+                                className={` bg-ui-primary hover:bg-ui-primary-dark
+                        active:bg-[#0c3ca3] disabled:opacity-60
+                        text-white text-sm font-bold rounded-lg
+                        transition-all duration-200
+                        shadow-[0_4px_14px_rgba(19,91,236,0.25)]
+                        hover:shadow-[0_6px_20px_rgba(19,91,236,0.35)]
+                        flex items-center justify-center gap-2 mt-1 cursor-pointer ${mode == "create" && "bg-ui-primary-dark"}`}
+                            >
+                                Crear nuevo
+                            </Button>
+
+                            <Button
+                                type="button"
+                                onClick={() => setMode("select")}
+                                className={` bg-ui-primary hover:bg-ui-primary-dark
+                        active:bg-[#0c3ca3] disabled:opacity-60
+                        text-white text-sm font-bold rounded-lg
+                        transition-all duration-200
+                        shadow-[0_4px_14px_rgba(19,91,236,0.25)]
+                        hover:shadow-[0_6px_20px_rgba(19,91,236,0.35)]
+                        flex items-center justify-center gap-2 mt-1 cursor-pointer ${mode == "select" && "bg-ui-primary-dark"}`}
+                            >
+                                Usar existente
+                            </Button>
+                        </div>
+
                         {/* Form */}
                         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
                             {/* Nombre */}
-                            <div className="space-y-2">
+                            {/* <div className="space-y-2">
                                 <Label htmlFor="name">Nombre del template</Label>
                                 <Input
                                     id="name"
@@ -97,10 +141,10 @@ export default function CreateTemplatePage() {
                                 <p className="text-xs text-ui-secondary dark:text-slate-500">
                                     Este nombre te ayudará a identificar el template más adelante.
                                 </p>
-                            </div>
+                            </div> */}
 
                             {/* Descripción */}
-                            <div className="space-y-2">
+                            {/* <div className="space-y-2">
                                 <Label htmlFor="description">Descripción</Label>
                                 <Textarea
                                     id="description"
@@ -119,10 +163,10 @@ export default function CreateTemplatePage() {
                                 <p className="text-xs text-ui-secondary dark:text-slate-500">
                                     Opcional, pero recomendado para dar más contexto a tu equipo.
                                 </p>
-                            </div>
+                            </div> */}
 
                             {/* Switch */}
-                            <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4">
+                            {/* <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4">
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium text-ui-main dark:text-white">
                                         Template activo
@@ -143,7 +187,110 @@ export default function CreateTemplatePage() {
         dark:data-[state=unchecked]:bg-slate-700
     "
                                 />
-                            </div>
+                            </div> */}
+
+
+
+                            {mode === "create" && (
+                                <>
+                                    {/* Nombre */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="name">Nombre del template</Label>
+                                        <Input
+                                            id="name"
+                                            placeholder="Ej: Smartphone estándar"
+                                            {...register("name")}
+                                            className={cn(
+                                                "h-11 px-4 pr-12 rounded-lg",
+                                                "bg-white! dark:bg-ui-dark!",
+                                                "border-gray-200! dark:border-gray-700!",
+                                                "text-ui-main! dark:text-white!",
+                                                "placeholder:text-gray-400! dark:placeholder:text-slate-500!",
+                                                "focus:border-ui-primary! focus:ring-2! focus:ring-ui-primary!"
+                                            )}
+                                        />
+                                        {errors.name && (
+                                            <p className="text-xs text-red-500">
+                                                {errors.name.message}
+                                            </p>
+                                        )}
+                                        <p className="text-xs text-ui-secondary dark:text-slate-500">
+                                            Este nombre te ayudará a identificar el template más adelante.
+                                        </p>
+                                    </div>
+
+                                    {/* Descripción */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="description">Descripción</Label>
+                                        <Textarea
+                                            id="description"
+                                            placeholder="Ej: Template para teléfonos móviles con especificaciones técnicas"
+                                            {...register("description")}
+                                            className={cn(
+                                                "min-h-24 px-4 py-3 rounded-lg resize-none",
+                                                "bg-white! dark:bg-ui-dark!",
+                                                "border-gray-200! dark:border-gray-700!",
+                                                "text-ui-main! dark:text-white!",
+                                                "placeholder:text-gray-400! dark:placeholder:text-slate-500!",
+                                                "focus:border-ui-primary! focus:ring-2! focus:ring-ui-primary!"
+                                            )}
+                                        />
+
+                                        <p className="text-xs text-ui-secondary dark:text-slate-500">
+                                            Opcional, pero recomendado para dar más contexto a tu equipo.
+                                        </p>
+                                    </div>
+
+                                    {/* Switch activo */}
+                                    <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4">
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-medium text-ui-main dark:text-white">
+                                                Template activo
+                                            </p>
+                                            <p className="text-xs text-ui-secondary dark:text-slate-500">
+                                                Solo los templates activos pueden usarse para crear productos.
+                                            </p>
+                                        </div>
+
+                                        <Switch
+                                            checked={isActive}
+                                            onCheckedChange={(value) =>
+                                                setValue("is_active", value)
+                                            }
+                                            className="
+        data-[state=checked]:bg-ui-primary
+        data-[state=unchecked]:bg-gray-200
+        dark:data-[state=unchecked]:bg-slate-700
+    "
+                                        />
+                                    </div>
+                                </>
+                            )}
+                            {mode === "select" && (
+                                <div className="space-y-2">
+                                    <Label>Selecciona un template</Label>
+
+                                    <Select onValueChange={(value) => setSelectedTemplate(value)}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Elige un template existente" />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            {templates.map((template) => (
+                                                <SelectItem key={template.id} value={template.id.toString()}>
+                                                    {template.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    <p className="text-xs text-ui-secondary">
+                                        Este template se usará para definir los atributos del producto.
+                                    </p>
+                                </div>
+                            )}
+
+
 
                             {/* Actions */}
                             <div className="flex flex-col gap-4 mt-2">
@@ -158,7 +305,7 @@ export default function CreateTemplatePage() {
                         hover:shadow-[0_6px_20px_rgba(19,91,236,0.35)]
                         flex items-center justify-center gap-2 mt-1 cursor-pointer"
                                 >
-                                    Crear template
+                                    {mode === "create" ? "Crear template" : "Continuar"}
                                     <span className="material-symbols-outlined text-[18px]">
                                         arrow_forward
                                     </span>
@@ -173,25 +320,7 @@ export default function CreateTemplatePage() {
                             </div>
                         </form>
                     </CardContent>
-
-                    {/* Footer */}
-                    {/* <CardFooter className="justify-center gap-2 text-xs text-ui-secondary dark:text-slate-500 border-t border-slate-200/40 dark:border-slate-800 dark:bg-[#151b29] py-3">
-                    <p className="text-center text-ui-secondary dark:text-slate-500 text-xs font-medium flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[14px] align-text-bottom">
-                            timer
-                        </span>
-                        Esto solo tomará un par de minutos.
-                    </p>
-                </CardFooter> */}
                 </Card>
-                {/* <div className="flex justify-center">
-                <p className="text-center text-ui-secondary dark:text-slate-500 text-xs font-medium flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px] align-text-bottom">
-                        timer
-                    </span>
-                    Esto solo tomará un par de minutos.
-                </p>
-            </div> */}
             </div>
             <div className="flex justify-center">
                 <p className="text-center text-ui-secondary dark:text-slate-500 text-xs font-medium flex items-center gap-1">
