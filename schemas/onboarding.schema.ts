@@ -66,3 +66,22 @@ export const assignAttributeSchema = z
 export type AssignAttributeFormValues = z.infer<
     typeof assignAttributeSchema
 >;
+
+
+// schemas/product-onboarding.schema.ts
+
+export const productOnboardingSchema = z.object({
+    name: z.string().min(1, "El nombre es obligatorio"),
+    sku: z.string().min(1, "El SKU es obligatorio"),
+    barcode: z.string().optional(),
+    price: z.number().positive("Precio inválido"),
+    cost: z.number().optional(),
+    minimum_stock: z.number().optional(),
+    price_includes_tax: z.boolean(),
+    unit_of_measure: z.string().optional(),
+    is_active: z.boolean(),
+});
+
+export type ProductOnboardingForm = z.infer<
+    typeof productOnboardingSchema
+>;
