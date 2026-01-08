@@ -1,3 +1,4 @@
+import Link from "next/link";
 
 export default function AuthLayout({
     children,
@@ -21,6 +22,19 @@ export default function AuthLayout({
 
             {/* Main content */}
             <main className="relative z-10 flex flex-1 flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+                <div className="absolute top-6 left-6">
+                    <Link
+                        href="/"
+                        aria-label="Volver al inicio"
+                        className="text-ui-secondary
+    hover:text-ui-primary transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">
+                            arrow_back
+                        </span>
+                    </Link>
+                </div>
+
                 <div
                     className="w-full max-w-105 bg-white sm:rounded-xl
             shadow-[0_8px_30px_rgb(0,0,0,0.08)]
