@@ -45,3 +45,24 @@ export const attributeSchema = z.object({
 });
 
 export type AttributeFormValues = z.infer<typeof attributeSchema>;
+
+
+export const assignAttributeSchema = z
+    .object({
+        custom_attribute: z.number().nullable(),
+        global_attribute: z.number().nullable(),
+        is_required: z.boolean(),
+        order: z.number().int().min(1),
+        default_value: z.string().nullable(),
+    })
+    .refine(
+        (data) => data.custom_attribute !== null || data.global_attribute !== null,
+        {
+            message: "Debes seleccionar al menos un atributo personalizado o global",
+            path: ["custom_attribute"],
+        }
+    );
+
+export type AssignAttributeFormValues = z.infer<
+    typeof assignAttributeSchema
+>;
