@@ -10,12 +10,19 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { buttonBaseClasses, inputBaseClasses } from "@/lib/ui/input-classes";
 import { Input } from "@/components/ui/input";
+import { authService } from "@/services/authService";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function RegisterForm() {
+
+    const router = useRouter()
     const {
         register,
         handleSubmit,
+        setError,
         formState: { errors, isSubmitting },
+        setFocus,
     } = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
     });
@@ -24,6 +31,38 @@ export default function RegisterForm() {
 
     const onSubmit = async (data: RegisterFormValues) => {
         console.log("Register data:", data);
+        try {
+            await authService.register(data)
+            router.push("/login")
+        } catch (err: any) {
+            const apiError = err?.response?.data;
+
+            if (!apiError) return;
+
+            // Error general
+            if (apiError.detail) {
+                setError("root", {
+                    type: "server",
+                    message: apiError.detail,
+                });
+            }
+
+            // Errores por campo
+            if (Array.isArray(apiError.errors) && apiError.errors.length > 0) {
+                const firstErrorField = apiError.errors[0].field;
+
+                apiError.errors.forEach(
+                    (error: { field: string; message: string }) => {
+                        setError(error.field as keyof RegisterFormValues, {
+                            type: "server",
+                            message: error.message,
+                        });
+                    }
+                );
+
+                setFocus(firstErrorField as keyof RegisterFormValues);
+            }
+        }
     };
 
     return (
@@ -53,7 +92,7 @@ export default function RegisterForm() {
                 <div className="space-y-2">
                     <Label
                         htmlFor="email"
-
+                        className={cn(errors.email && "text-red-500")}
                     >
                         Email
                     </Label>
@@ -62,7 +101,11 @@ export default function RegisterForm() {
                         id="email"
                         type="email"
                         placeholder="name@company.com"
-                        className={inputBaseClasses}
+                        className={cn(
+                            inputBaseClasses,
+                            errors.email &&
+                            "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!"
+                        )}
                         {...register("email")}
                     />
 
@@ -87,7 +130,7 @@ export default function RegisterForm() {
                             id="password"
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
-                            className={inputBaseClasses}
+                            className={cn(inputBaseClasses, errors.password && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")}
                             {...register("password")}
                         />
 
@@ -123,7 +166,7 @@ export default function RegisterForm() {
                         id="re_password"
                         type="password"
                         placeholder="••••••••"
-                        className={inputBaseClasses}
+                        className={cn(inputBaseClasses, errors.re_password && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")}
                         {...register("re_password")}
                     />
 
