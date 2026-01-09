@@ -33,4 +33,9 @@ export const authService = {
         const response = await axiosInstance.get('/api/v1/accounts/me/');
         return response.data;
     },
+
+    activate: async (uid: string, token: string) => {
+        const response = await axiosInstance.post('/api/v1/accounts/activation/', { uid, token })
+        return response.status
+    }
 };
