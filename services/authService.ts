@@ -36,6 +36,11 @@ export const authService = {
 
     activate: async (uid: string, token: string) => {
         const response = await axiosInstance.post('/api/v1/accounts/activation/', { uid, token })
-        return response.status
+        return response.data
+    },
+
+    resendActivation: async (email: string) => {
+        const response = await axiosInstance.post('/api/v1/accounts/resend_activation/', { email })
+        return response.data
     }
 };
