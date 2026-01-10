@@ -42,5 +42,15 @@ export const authService = {
     resendActivation: async (email: string) => {
         const response = await axiosInstance.post('/api/v1/accounts/resend_activation/', { email })
         return response.data
+    },
+
+    requestPasswordReset: async ({ email }: { email: string }) => {
+        const response = await axiosInstance.post('/api/v1/accounts/reset_password/', { email })
+        return response.data
+    },
+
+    confirmPasswordReset: async ({ uid, token, new_password, re_new_password }: { uid: string, token: string, new_password: string, re_new_password: string }) => {
+        const response = await axiosInstance.post('/api/v1/accounts/reset_password_confirm/', { uid, token, new_password, re_new_password })
+        return response.data
     }
 };

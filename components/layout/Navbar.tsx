@@ -59,7 +59,7 @@ function Navbar() {
                 {/* Right actions */}
                 <div className="flex items-center gap-4">
                     <Link
-                        href="#"
+                        href="/login"
                         className="hidden md:block text-sm font-bold text-ui-main hover:text-ui-primary"
                     >
                         Iniciar sesión
@@ -106,7 +106,7 @@ function Navbar() {
 
                         <div className="mt-2 border-t pt-3">
                             <Link
-                                href="#"
+                                href="/login"
                                 className="block rounded-lg px-3 py-2 text-sm font-bold text-ui-primary hover:bg-blue-50"
                             >
                                 Iniciar sesión
