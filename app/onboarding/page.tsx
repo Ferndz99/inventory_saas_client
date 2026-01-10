@@ -16,7 +16,7 @@ type OnboardingStepUI = {
     title: string
     description: string
     actionLabel: string
-    getHref?: (ctx: OnboardingContextState) => string | null
+    href: string
 }
 
 const ONBOARDING_STEPS_UI: OnboardingStepUI[] = [
@@ -25,38 +25,35 @@ const ONBOARDING_STEPS_UI: OnboardingStepUI[] = [
         title: "Paso 1 – Crear categorías",
         description: "Organiza tus productos creando categorías.",
         actionLabel: "Crear categorías",
-        getHref: () => "/onboarding/categories",
+        href: "/onboarding/categories",
     },
     {
         id: "create_template",
         title: "Paso 2 – Crear plantillas",
         description: "Define estructuras reutilizables para tus productos.",
         actionLabel: "Crear plantillas",
-        getHref: () => "/onboarding/templates",
+        href: "/onboarding/templates",
     },
     {
         id: "create_attribute",
         title: "Paso 3 – Crear atributos",
         description: "Agrega atributos a tus plantillas.",
         actionLabel: "Crear atributo",
-        getHref: () => "/onboarding/attributes",
+        href: "/onboarding/attributes/create",
     },
     {
         id: "assign_attribute",
         title: "Paso 4 – Asignar atributos",
         description: "Asigna atributos a tus plantillas.",
         actionLabel: "Asignar atributo",
-        getHref: ({ activeTemplateId }) =>
-            activeTemplateId
-                ? `/onboarding/templates/${activeTemplateId}/attributes/assign/`
-                : null,
+        href: "/onboarding/attributes/assign"
     },
     {
         id: "create_product",
         title: "Paso 5 – Crear productos",
         description: "Agrega tus primeros productos al sistema.",
         actionLabel: "Crear producto",
-        getHref: () => "/onboarding/products",
+        href: "/onboarding/products",
     },
 ]
 
@@ -82,7 +79,6 @@ export default function OnboardingPage() {
 
     const router = useRouter()
     const [onboarding, setOnboarding] = useState<Root | null>(null)
-    const onboardingCtx = useOnboarding()
 
 
     useEffect(() => {
@@ -101,14 +97,8 @@ export default function OnboardingPage() {
         ? ONBOARDING_STEPS_UI.map(step => ({
             ...step,
             completed: onboarding.steps[step.id],
-            href: step.getHref?.(onboardingCtx) ?? null,
         }))
         : []
-
-    // const steps = ONBOARDING_STEPS_UI.map(step => ({
-    //     ...step,
-    //     completed: onboarding.steps[step.id],
-    // }))
 
     const activeIndex = steps.findIndex(step => !step.completed)
     const completedCount = steps.filter(s => s.completed).length

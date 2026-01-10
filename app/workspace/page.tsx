@@ -13,6 +13,7 @@ export default function WorkspaceEntry() {
         const verifyCompany = async () => {
             try {
                 await companyService.getCompany()
+                router.replace("/dashboard")
             } catch (error: any) {
                 if (error.response?.status === 403) {
                     router.replace("/onboarding/company")

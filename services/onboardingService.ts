@@ -1,5 +1,5 @@
 import axiosInstance from "@/lib/axios"
-import { CreateCompanyFormValues } from "@/schemas/onboarding.schema"
+import { CreateCategoryForm, CreateCompanyFormValues } from "@/schemas/onboarding.schema"
 
 
 export const onboardingService = {
@@ -12,4 +12,9 @@ export const onboardingService = {
         const response = await axiosInstance.get('/api/v1/onboarding/progress/')
         return response.data
     },
+
+    createCategory: async ({ name, is_active }: CreateCategoryForm) => {
+        const response = await axiosInstance.post('/api/v1/categories/', { name, is_active })
+        return response.data
+    }
 }

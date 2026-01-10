@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
+import { onboardingService } from "@/services/onboardingService";
+import { useOnboarding } from "@/contexts/OnboardingContext";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { inputBaseClasses } from "@/lib/ui/input-classes";
+import { toast } from "sonner";
 
 
 
@@ -15,6 +21,7 @@ import { useRouter } from "next/navigation";
 export default function OnboardingPage() {
 
     const router = useRouter()
+    const { setCategory } = useOnboarding()
 
     const {
         register,
@@ -32,13 +39,15 @@ export default function OnboardingPage() {
 
     const isActive = watch("is_active");
 
-    const onSubmit = (data: CreateCategoryForm) => {
+    const onSubmit = async (data: CreateCategoryForm) => {
         console.log("CREATE CATEGORY", data);
-        router.push("/onboarding")
-
-        // TODO:
-        // await api.post("/categories/", data)
-        // marcar paso como completado en el wizard
+        const category = await onboardingService.createCategory(data)
+        toast.success("Categoría creada correctamente")
+        setCategory({
+            id: category.id,
+            name: category.name,
+        })
+        router.replace("/onboarding")
     };
 
     return (
@@ -72,20 +81,16 @@ export default function OnboardingPage() {
                     >
                         {/* Nombre */}
                         <div className="space-y-2">
-                            <Label htmlFor="name">
+                            <Label htmlFor="name" className={cn(errors.name && "text-red-500")}>
                                 Nombre de la categoría
                             </Label>
 
                             <div className="relative">
-                                <input
+                                <Input
                                     id="name"
                                     type="text"
                                     placeholder="Ej: Electrónica"
-                                    className="w-full h-11 px-4 pr-10 rounded-lg bg-white
-                                    border border-gray-200 text-ui-text-main
-                                    placeholder-gray-400 text-sm
-                                    focus:outline-none focus:ring-2 focus:ring-ui-primary
-                                    focus:border-ui-primary transition-all"
+                                    className={cn(inputBaseClasses)}
                                     {...register("name")}
                                 />
 
