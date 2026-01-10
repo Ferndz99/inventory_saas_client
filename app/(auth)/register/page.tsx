@@ -7,12 +7,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterFormValues } from "@/schemas/auth.schema";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Label } from "@/components/ui/label";
+import { buttonBaseClasses, inputBaseClasses } from "@/lib/ui/input-classes";
+import { Input } from "@/components/ui/input";
+import { authService } from "@/services/authService";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function RegisterForm() {
+
+    const router = useRouter()
     const {
         register,
         handleSubmit,
+        setError,
         formState: { errors, isSubmitting },
+        setFocus,
     } = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
     });
@@ -21,47 +31,81 @@ export default function RegisterForm() {
 
     const onSubmit = async (data: RegisterFormValues) => {
         console.log("Register data:", data);
+        try {
+            await authService.register(data)
+            router.push("/login")
+        } catch (err: any) {
+            const apiError = err?.response?.data;
+
+            if (!apiError) return;
+
+            // Error general
+            if (apiError.detail) {
+                setError("root", {
+                    type: "server",
+                    message: apiError.detail,
+                });
+            }
+
+            // Errores por campo
+            if (Array.isArray(apiError.errors) && apiError.errors.length > 0) {
+                const firstErrorField = apiError.errors[0].field;
+
+                apiError.errors.forEach(
+                    (error: { field: string; message: string }) => {
+                        setError(error.field as keyof RegisterFormValues, {
+                            type: "server",
+                            message: error.message,
+                        });
+                    }
+                );
+
+                setFocus(firstErrorField as keyof RegisterFormValues);
+            }
+        }
     };
 
     return (
         <>
-            <div className="flex flex-col items-center text-center mb-8">
+            <div className="flex flex-col items-center text-center gap-5 mb-8 cursor-default">
                 {/* Icon Brand */}
                 <div
-                    className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-ui-primary mb-5 shadow-glow"
+                    className="h-14 w-14 rounded-xl bg-ui-primary/10 flex items-center justify-center text-ui-primary border border-ui-primary/20"
                 >
-                    <span className="material-symbols-outlined text-[26px]">
+                    <span className="material-symbols-outlined text-[28px]">
                         grid_view
                     </span>
                 </div>
 
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
-                    Crear cuenta
-                </h2>
-
-                <p className="text-slate-500 dark:text-slate-400 text-[15px] leading-relaxed">
-                    Regístrate para comenzar a usar la plataforma
-                </p>
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-bold tracking-tight text-ui-main">
+                        Crea tu cuenta
+                    </h1>
+                    <p className="text-sm text-ui-secondary">
+                        Lleva el control de tus ventas y stock desde hoy mismo.
+                    </p>
+                </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
                 {/* Email */}
                 <div className="space-y-2">
-                    <label
+                    <Label
                         htmlFor="email"
-                        className="text-sm font-medium text-ui-main"
+                        className={cn(errors.email && "text-red-500")}
                     >
                         Email
-                    </label>
+                    </Label>
 
-                    <input
+                    <Input
                         id="email"
                         type="email"
                         placeholder="name@company.com"
-                        className="w-full h-11 px-4 rounded-lg bg-white border border-gray-200
-                                text-ui-main placeholder-gray-400 text-sm
-                                focus:outline-none focus:ring-2 focus:ring-ui-primary
-                                focus:border-ui-primary transition-all duration-200"
+                        className={cn(
+                            inputBaseClasses,
+                            errors.email &&
+                            "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!"
+                        )}
                         {...register("email")}
                     />
 
@@ -75,22 +119,18 @@ export default function RegisterForm() {
 
                 {/* Password */}
                 <div className="space-y-2">
-                    <label
+                    <Label
                         htmlFor="password"
-                        className="text-sm font-medium text-ui-main"
                     >
                         Password
-                    </label>
+                    </Label>
 
                     <div className="relative">
-                        <input
+                        <Input
                             id="password"
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
-                            className="w-full h-11 px-4 pr-12 rounded-lg  text-ui-main border bg-white border-gray-200
-                placeholder-gray-400 text-sm
-                focus:outline-none focus:ring-2 focus:ring-ui-primary
-                focus:border-ui-primary transition-all duration-200"
+                            className={cn(inputBaseClasses, errors.password && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")}
                             {...register("password")}
                         />
 
@@ -116,21 +156,17 @@ export default function RegisterForm() {
 
                 {/* Confirm Password */}
                 <div className="space-y-2">
-                    <label
+                    <Label
                         htmlFor="re_password"
-                        className="text-sm font-medium text-ui-main"
                     >
                         Confirmar password
-                    </label>
+                    </Label>
 
-                    <input
+                    <Input
                         id="re_password"
                         type="password"
                         placeholder="••••••••"
-                        className="w-full h-11 px-4 rounded-lg bg-white border border-gray-200
-                        text-ui-main placeholder-gray-400 text-sm
-                            focus:outline-none focus:ring-2 focus:ring-ui-primary
-                            focus:border-ui-primary transition-all duration-200"
+                        className={cn(inputBaseClasses, errors.re_password && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")}
                         {...register("re_password")}
                     />
 
@@ -146,15 +182,9 @@ export default function RegisterForm() {
                 <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full h-11 bg-ui-primary hover:bg-ui-primary-dark
-            active:bg-[#0c3ca3] disabled:opacity-60
-            text-white text-sm font-bold rounded-lg
-            transition-all duration-200
-            shadow-[0_4px_14px_rgba(19,91,236,0.25)]
-            hover:shadow-[0_6px_20px_rgba(19,91,236,0.35)]
-            flex items-center justify-center gap-2 mt-1 cursor-pointer"
+                    className={buttonBaseClasses}
                 >
-                    {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
+                    {isSubmitting ? "Creando cuenta..." : "Crea tu cuenta"}
                 </Button>
             </form>
 
@@ -163,7 +193,7 @@ export default function RegisterForm() {
                 <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-200" />
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
+                <div className="relative flex justify-center text-xs uppercase cursor-default">
                     <span className="bg-white px-2 text-[#64748b]">
                         o continuar con
                     </span>
@@ -197,12 +227,11 @@ export default function RegisterForm() {
 
             {/* Footer link */}
             <div className="mt-8 text-center">
-                <p className="text-sm text-[#64748b]">
-                    ¿No tienes una cuenta?
+                <p className="text-sm text-ui-secondary cursor-default">
+                    ¿Ya tienes una cuenta?
                     <Link
                         href="/login"
-                        className="font-medium text-ui-primary
-                        hover:text-ui-primary-dark transition-colors ml-1"
+                        className="ml-1 font-medium text-ui-primary hover:text-ui-primary-dark transition-colors"
                     >
                         Inicia sesión
                     </Link>
