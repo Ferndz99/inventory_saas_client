@@ -7,4 +7,9 @@ export const onboardingService = {
         const response = await axiosInstance.post('/api/v1/onboarding/setup-company/', { company_name, company_rut })
         return response.data
     },
+
+    getOnboardingStatus: async () => {
+        const response = await axiosInstance.get('/api/v1/onboarding/progress/')
+        return response.data
+    },
 }
