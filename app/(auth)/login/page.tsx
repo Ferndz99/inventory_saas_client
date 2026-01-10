@@ -4,23 +4,25 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "@/schemas/auth.schema";
-import * as z from "zod";
+import { LoginFormValues, loginSchema } from "@/schemas/auth.schema";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { buttonBaseClasses, inputBaseClasses } from "@/lib/ui/input-classes";
-
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { authService } from "@/services/authService";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 
 
 export default function LoginPage() {
 
+    const router = useRouter()
     const {
         register,
         handleSubmit,
+        setError,
+        setFocus,
         formState: { errors, isSubmitting },
     } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
 
@@ -28,6 +30,35 @@ export default function LoginPage() {
 
     const onSubmit = async (data: LoginFormValues) => {
         console.log("Login data:", data);
+        try {
+            await authService.login(data)
+            router.replace("/workspace")
+        } catch (error: any) {
+            const apiError = error?.response?.data;
+            if (!apiError) return;
+
+            if (apiError.detail) {
+                setError("root", {
+                    type: "server",
+                    message: apiError.detail,
+                });
+            }
+
+            if (Array.isArray(apiError.errors) && apiError.errors.length > 0) {
+                const firstErrorField = apiError.errors[0].field;
+
+                apiError.errors.forEach(
+                    (error: { field: string; message: string }) => {
+                        setError(error.field as keyof LoginFormValues, {
+                            type: "server",
+                            message: error.message,
+                        });
+                    }
+                );
+
+                setFocus(firstErrorField as keyof LoginFormValues);
+            }
+        }
     };
 
     return (
@@ -49,18 +80,18 @@ export default function LoginPage() {
                     </p>
                 </div>
             </div>
-
+            {/* TODO: modificar formulario para que muestre errores de raiz(root) */}
             {/* Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
                 {/* Email */}
                 <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email" className={cn(errors.email && "text-red-500")}>Email</Label>
                     <Input
                         id="email"
                         type="email"
                         placeholder="name@company.com"
                         {...register("email")}
-                        className={inputBaseClasses}
+                        className={cn(inputBaseClasses, errors.email && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")}
                     />
                     {errors.email && (
                         <p className="text-xs text-red-500">
@@ -71,7 +102,7 @@ export default function LoginPage() {
 
                 {/* Password */}
                 <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password" className={cn(errors.email && "text-red-500")}>Password</Label>
 
                     <div className="relative">
                         <Input
@@ -79,7 +110,8 @@ export default function LoginPage() {
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             {...register("password")}
-                            className={inputBaseClasses}
+                            className={cn(inputBaseClasses, errors.password &&
+                                "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")}
                         />
 
                         <button

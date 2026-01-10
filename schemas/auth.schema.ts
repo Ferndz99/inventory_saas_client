@@ -6,8 +6,10 @@ export const loginSchema = z.object({
 
     password: z
         .string()
-        .min(8, "La contraseña debe tener al menos 8 caracteres"),
+        .min(1, "La contraseña es obligatoria"),
 });
+
+export type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const registerSchema = z.object({
     email: z

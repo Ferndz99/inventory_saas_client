@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: "http://127.0.0.1:8000/",
+    baseURL: "http://localhost:8000/",
     headers: {
         'Content-Type': 'application/json',
     },
@@ -59,8 +59,8 @@ axiosInstance.interceptors.response.use(
 
             try {
                 // Llama al endpoint de refresh
-                const response = await axios.post(
-                    `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+                const response = await axiosInstance.post(
+                    `http://localhost:8000/auth/refresh`,
                     {},
                     { withCredentials: true } // Envía la cookie del refresh_token
                 );
