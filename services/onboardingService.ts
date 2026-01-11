@@ -1,5 +1,5 @@
 import axiosInstance from "@/lib/axios"
-import { CreateCategoryForm, CreateCompanyFormValues, TemplateFormValues } from "@/schemas/onboarding.schema"
+import { AttributeFormValues, CreateCategoryForm, CreateCompanyFormValues, TemplateFormValues } from "@/schemas/onboarding.schema"
 
 
 export const onboardingService = {
@@ -25,6 +25,11 @@ export const onboardingService = {
 
     createTemplate: async ({ name, description, is_active }: TemplateFormValues) => {
         const response = await axiosInstance.post('/api/v1/templates/', { name, description, is_active })
+        return response.data
+    },
+
+    createAttribute: async ({ name, data_type, description, is_active, unit_of_measure }: AttributeFormValues) => {
+        const response = await axiosInstance.post('/api/v1/custom-attributes/', { name, data_type, description, is_active, unit_of_measure })
         return response.data
     }
 }
