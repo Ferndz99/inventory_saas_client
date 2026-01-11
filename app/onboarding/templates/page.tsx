@@ -18,21 +18,41 @@ import { Label } from "@/components/ui/label";
 import { TemplateFormValues, templateSchema } from "@/schemas/onboarding.schema";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { onboardingService } from "@/services/onboardingService";
+import { useOnboarding } from "@/contexts/OnboardingContext";
+import { buttonBaseClasses } from "@/lib/ui/input-classes";
 
 
-const templates = [
-    {
-        id: "1",
-        name: "template base"
-    }
-]
 
+type TemplateOption = {
+    id: number
+    name: string
+}
 
 export default function CreateTemplatePage() {
 
     const router = useRouter()
+    const { setTemplate } = useOnboarding()
+
+    const [templates, setTemplates] = useState<TemplateOption[]>([])
+    const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null)
+
+    useEffect(() => {
+        const loadTemplates = async () => {
+            try {
+                const data = await onboardingService.getTemplates()
+                console.log(data)
+                setTemplates(data.results)
+            } catch (error) {
+                console.error("Error loading templates", error)
+            }
+        }
+
+        loadTemplates()
+    }, [])
+
 
     const {
         register,
@@ -49,16 +69,43 @@ export default function CreateTemplatePage() {
         },
     });
 
+
     const isActive = watch("is_active");
 
     const [mode, setMode] = useState<"create" | "select">("create")
-    const [selectedTemplate, setSelectedTemplate] = useState<string>("")
+
 
     const onSubmit = async (data: TemplateFormValues) => {
-        console.log("Template data:", data);
-        // POST /templates
-        // luego redirect al wizard
-        router.push("/onboarding")
+        try {
+            if (mode === "create") {
+                const template = await onboardingService.createTemplate(data)
+
+                setTemplate({
+                    id: template.id,
+                    name: template.name,
+                })
+            }
+
+            if (mode === "select") {
+                const template = templates.find(
+                    (t) => t.id === selectedTemplateId
+                )
+
+                if (!template) {
+                    throw new Error("Template no encontrado")
+                }
+
+                setTemplate({
+                    id: template.id,
+                    name: template.name,
+                })
+            }
+
+            router.replace("/onboarding")
+        } catch (error) {
+            console.error(error)
+        }
+
     };
 
     return (
@@ -89,13 +136,7 @@ export default function CreateTemplatePage() {
                             <Button
                                 type="button"
                                 onClick={() => setMode("create")}
-                                className={` bg-ui-primary hover:bg-ui-primary-dark
-                        active:bg-[#0c3ca3] disabled:opacity-60
-                        text-white text-sm font-bold rounded-lg
-                        transition-all duration-200
-                        shadow-[0_4px_14px_rgba(19,91,236,0.25)]
-                        hover:shadow-[0_6px_20px_rgba(19,91,236,0.35)]
-                        flex items-center justify-center gap-2 mt-1 cursor-pointer ${mode == "create" && "bg-ui-primary-dark"}`}
+                                className={cn(buttonBaseClasses, mode == "create" && "bg-ui-primary-dark")}
                             >
                                 Crear nuevo
                             </Button>
@@ -103,13 +144,7 @@ export default function CreateTemplatePage() {
                             <Button
                                 type="button"
                                 onClick={() => setMode("select")}
-                                className={` bg-ui-primary hover:bg-ui-primary-dark
-                        active:bg-[#0c3ca3] disabled:opacity-60
-                        text-white text-sm font-bold rounded-lg
-                        transition-all duration-200
-                        shadow-[0_4px_14px_rgba(19,91,236,0.25)]
-                        hover:shadow-[0_6px_20px_rgba(19,91,236,0.35)]
-                        flex items-center justify-center gap-2 mt-1 cursor-pointer ${mode == "select" && "bg-ui-primary-dark"}`}
+                                className={cn(buttonBaseClasses, mode == "select" && "bg-ui-primary-dark")}
                             >
                                 Usar existente
                             </Button>
@@ -117,79 +152,6 @@ export default function CreateTemplatePage() {
 
                         {/* Form */}
                         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-                            {/* Nombre */}
-                            {/* <div className="space-y-2">
-                                <Label htmlFor="name">Nombre del template</Label>
-                                <Input
-                                    id="name"
-                                    placeholder="Ej: Smartphone estándar"
-                                    {...register("name")}
-                                    className={cn(
-                                        "h-11 px-4 pr-12 rounded-lg",
-                                        "bg-white! dark:bg-ui-dark!",
-                                        "border-gray-200! dark:border-gray-700!",
-                                        "text-ui-main! dark:text-white!",
-                                        "placeholder:text-gray-400! dark:placeholder:text-slate-500!",
-                                        "focus:border-ui-primary! focus:ring-2! focus:ring-ui-primary!"
-                                    )}
-                                />
-                                {errors.name && (
-                                    <p className="text-xs text-red-500">
-                                        {errors.name.message}
-                                    </p>
-                                )}
-                                <p className="text-xs text-ui-secondary dark:text-slate-500">
-                                    Este nombre te ayudará a identificar el template más adelante.
-                                </p>
-                            </div> */}
-
-                            {/* Descripción */}
-                            {/* <div className="space-y-2">
-                                <Label htmlFor="description">Descripción</Label>
-                                <Textarea
-                                    id="description"
-                                    placeholder="Ej: Template para teléfonos móviles con especificaciones técnicas"
-                                    {...register("description")}
-                                    className={cn(
-                                        "min-h-24 px-4 py-3 rounded-lg resize-none",
-                                        "bg-white! dark:bg-ui-dark!",
-                                        "border-gray-200! dark:border-gray-700!",
-                                        "text-ui-main! dark:text-white!",
-                                        "placeholder:text-gray-400! dark:placeholder:text-slate-500!",
-                                        "focus:border-ui-primary! focus:ring-2! focus:ring-ui-primary!"
-                                    )}
-                                />
-
-                                <p className="text-xs text-ui-secondary dark:text-slate-500">
-                                    Opcional, pero recomendado para dar más contexto a tu equipo.
-                                </p>
-                            </div> */}
-
-                            {/* Switch */}
-                            {/* <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 p-4">
-                                <div className="space-y-1">
-                                    <p className="text-sm font-medium text-ui-main dark:text-white">
-                                        Template activo
-                                    </p>
-                                    <p className="text-xs text-ui-secondary dark:text-slate-500">
-                                        Solo los templates activos pueden usarse para crear productos.
-                                    </p>
-                                </div>
-
-                                <Switch
-                                    checked={isActive}
-                                    onCheckedChange={(value) =>
-                                        setValue("is_active", value)
-                                    }
-                                    className="
-        data-[state=checked]:bg-ui-primary
-        data-[state=unchecked]:bg-gray-200
-        dark:data-[state=unchecked]:bg-slate-700
-    "
-                                />
-                            </div> */}
-
-
 
                             {mode === "create" && (
                                 <>
@@ -270,14 +232,20 @@ export default function CreateTemplatePage() {
                                 <div className="space-y-2">
                                     <Label>Selecciona un template</Label>
 
-                                    <Select onValueChange={(value) => setSelectedTemplate(value)}>
+
+                                    <Select
+                                        onValueChange={(value) => setSelectedTemplateId(Number(value))}
+                                    >
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Elige un template existente" />
                                         </SelectTrigger>
 
                                         <SelectContent>
                                             {templates.map((template) => (
-                                                <SelectItem key={template.id} value={template.id.toString()}>
+                                                <SelectItem
+                                                    key={template.id}
+                                                    value={template.id.toString()}
+                                                >
                                                     {template.name}
                                                 </SelectItem>
                                             ))}
@@ -291,19 +259,15 @@ export default function CreateTemplatePage() {
                             )}
 
 
-
                             {/* Actions */}
                             <div className="flex flex-col gap-4 mt-2">
                                 <Button
                                     type="submit"
-                                    disabled={isSubmitting}
-                                    className="w-full h-11 bg-ui-primary hover:bg-ui-primary-dark
-                        active:bg-[#0c3ca3] disabled:opacity-60
-                        text-white text-sm font-bold rounded-lg
-                        transition-all duration-200
-                        shadow-[0_4px_14px_rgba(19,91,236,0.25)]
-                        hover:shadow-[0_6px_20px_rgba(19,91,236,0.35)]
-                        flex items-center justify-center gap-2 mt-1 cursor-pointer"
+                                    disabled={
+                                        isSubmitting ||
+                                        (mode === "select" && !selectedTemplateId)
+                                    }
+                                    className={cn(buttonBaseClasses)}
                                 >
                                     {mode === "create" ? "Crear template" : "Continuar"}
                                     <span className="material-symbols-outlined text-[18px]">
@@ -323,7 +287,7 @@ export default function CreateTemplatePage() {
                 </Card>
             </div>
             <div className="flex justify-center">
-                <p className="text-center text-ui-secondary dark:text-slate-500 text-xs font-medium flex items-center gap-1">
+                <p className="text-center text-ui-secondary dark:text-slate-500 text-xs font-medium flex items-center gap-1 cursor-default">
                     <span className="material-symbols-outlined text-[14px] align-text-bottom">
                         timer
                     </span>
