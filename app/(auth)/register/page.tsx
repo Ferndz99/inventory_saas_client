@@ -13,10 +13,12 @@ import { Input } from "@/components/ui/input";
 import { authService } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useRedirectIfAuthenticated } from "@/contexts/AuthContext";
 
 export default function RegisterForm() {
 
     const router = useRouter()
+    const { loading: redirectLoading } = useRedirectIfAuthenticated("/workspace");
     const {
         register,
         handleSubmit,
@@ -28,6 +30,16 @@ export default function RegisterForm() {
     });
 
     const [showPassword, setShowPassword] = useState(false);
+
+    if (redirectLoading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <span className="material-symbols-outlined animate-spin">
+                    progress_activity
+                </span>
+            </div>
+        );
+    }
 
     const onSubmit = async (data: RegisterFormValues) => {
         console.log("Register data:", data);
