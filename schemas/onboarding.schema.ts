@@ -71,18 +71,51 @@ export type AssignAttributeFormValues = z.infer<
 
 
 // schemas/product-onboarding.schema.ts
+//TODO: ARREGLAR NUMBER A COERCE().NUMBER()
+// export const productOnboardingSchema = z.object({
+//     name: z.string().min(1, "El nombre es obligatorio"),
+//     sku: z.string().min(1, "El SKU es obligatorio"),
+//     barcode: z.string().optional(),
+//     price: z.coerce
+//         .number("Precio inválido")
+//         .positive("El precio debe ser mayor a 0"),
+
+//     cost: z.coerce
+//         .number("Costo inválido")
+//         .optional(),
+
+//     minimum_stock: z.coerce
+//         .number("Stock mínimo inválido")
+//         .optional(),
+//     price_includes_tax: z.boolean(),
+//     unit_of_measure: z.string().optional(),
+//     is_active: z.boolean(),
+//     category: z.number(),
+//     template: z.number(),
+//     specifications: z.record(z.string(), z.any())
+
+// });
 
 export const productOnboardingSchema = z.object({
-    name: z.string().min(1, "El nombre es obligatorio"),
-    sku: z.string().min(1, "El SKU es obligatorio"),
+    name: z.string().min(1),
+    sku: z.string().min(1),
     barcode: z.string().optional(),
-    price: z.number().positive("Precio inválido"),
+
+    price: z.number().positive(),
+
     cost: z.number().optional(),
     minimum_stock: z.number().optional(),
+
     price_includes_tax: z.boolean(),
     unit_of_measure: z.string().optional(),
     is_active: z.boolean(),
+
+    category: z.number(),
+    template: z.number(),
+
+    specifications: z.record(z.string(), z.any()),
 });
+
 
 export type ProductOnboardingForm = z.infer<
     typeof productOnboardingSchema
