@@ -16,23 +16,50 @@ import {
 } from "@/components/ui/card";
 import { ProductOnboardingForm, productOnboardingSchema } from "@/schemas/onboarding.schema";
 import { cn } from "@/lib/utils";
+import { onboardingService } from "@/services/onboardingService";
+import { useOnboarding } from "@/contexts/OnboardingContext";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { inputBaseClasses } from "@/lib/ui/input-classes";
+import { toast } from "sonner";
 
-const inputBaseClasses = cn(
-    "h-11 px-4 pr-12 rounded-lg",
-    "bg-white! dark:bg-ui-dark!",
-    "border-gray-200! dark:border-gray-700!",
-    "text-ui-main! dark:text-white!",
-    "placeholder:text-gray-400! dark:placeholder:text-slate-500!",
-    "focus:border-ui-primary! focus:ring-2! focus:ring-ui-primary!"
-)
+
 
 
 export default function CreateProductOnboardingPage() {
+
+    const { template, category } = useOnboarding();
+    const router = useRouter();
+    const [attributes, setAttributes] = useState<any[]>([])
+    const [loadingAttributes, setLoadingAttributes] = useState(false)
+
+    useEffect(() => {
+        if (!template?.id) return
+
+        const fetchAttributes = async () => {
+            try {
+                setLoadingAttributes(true)
+                const data = await onboardingService.getAttributesFortemplate(
+                    template.id
+                )
+                setAttributes(data.attributes)
+            } catch (error) {
+                console.error("Error loading attributes", error)
+            } finally {
+                setLoadingAttributes(false)
+            }
+        }
+
+        fetchAttributes()
+    }, [template?.id])
+
     const {
         register,
         handleSubmit,
         watch,
         setValue,
+        setError,
+        setFocus,
         formState: { errors },
     } = useForm<ProductOnboardingForm>({
         resolver: zodResolver(productOnboardingSchema),
@@ -42,8 +69,64 @@ export default function CreateProductOnboardingPage() {
         },
     });
 
-    const onSubmit = (data: ProductOnboardingForm) => {
+    useEffect(() => {
+        if (template?.id) {
+            setValue("template", template.id);
+        }
+
+        if (category?.id) {
+            setValue("category", category.id);
+        }
+    }, [template, category, setValue]);
+
+
+    const onSubmit = async (data: ProductOnboardingForm) => {
         console.log("PRODUCT DATA", data);
+        try {
+            const payload = {
+                template: data.template,
+                specifications: data.specifications,
+                name: data.name,
+                price: data.price,
+                category: data.category,
+                sku: data.sku
+            }
+
+            // 1️⃣ Validar primero
+            await onboardingService.validateSpecifications(payload)
+
+            // 2️⃣ Si pasa, crear producto
+            await onboardingService.createProduct(data)
+
+            toast.success("Producto creado correctamente")
+            router.replace("/dashboard")
+        } catch (error: any) {
+            const apiError = error?.response?.data;
+            console.log(apiError)
+            if (!apiError) return;
+
+            if (apiError.detail) {
+                setError("root", {
+                    type: "server",
+                    message: apiError.detail,
+                });
+            }
+
+            if (Array.isArray(apiError.errors) && apiError.errors.length > 0) {
+                const firstErrorField = apiError.errors[0].field;
+
+                apiError.errors.forEach(
+                    (error: { field: string; message: string }) => {
+                        setError(error.field as keyof ProductOnboardingForm, {
+                            type: "server",
+                            message: error.message,
+                        });
+                    }
+                );
+
+                setFocus(firstErrorField as keyof ProductOnboardingForm);
+            }
+        }
     };
 
     return (
@@ -82,41 +165,41 @@ export default function CreateProductOnboardingPage() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="md:col-span-2 space-y-2">
-                                        <Label>Nombre del producto</Label>
-                                        <Input {...register("name")} placeholder="Ej: Camiseta algodón premium" className={inputBaseClasses}/>
+                                        <Label htmlFor="name" className={cn(errors.name && "text-red-500")}>Nombre del producto</Label>
+                                        <Input id="name" {...register("name")} placeholder="Ej: Camiseta algodón premium" className={cn(inputBaseClasses, errors.name && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")} />
                                         {errors.name && (
                                             <p className="text-xs text-red-500">{errors.name.message}</p>
                                         )}
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>SKU</Label>
-                                        <Input {...register("sku")} placeholder="Ej: CAM-BLK-001" className={inputBaseClasses} />
+                                        <Label htmlFor="sku" className={cn(errors.sku && "text-red-500")}>SKU</Label>
+                                        <Input id="sku" {...register("sku")} placeholder="Ej: CAM-BLK-001" className={cn(inputBaseClasses, errors.sku && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")} />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Código de barras</Label>
-                                        <Input {...register("barcode")} placeholder="Ej: 123456789" className={inputBaseClasses}/>
+                                        <Label htmlFor="barcode" className={cn(errors.barcode && "text-red-500")}>Código de barras</Label>
+                                        <Input id="barcode" {...register("barcode")} placeholder="Ej: 123456789" className={cn(inputBaseClasses, errors.barcode && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")} />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Precio de venta</Label>
-                                        <Input type="number" {...register("price")} placeholder="0.00" className={inputBaseClasses}/>
+                                        <Label htmlFor="price" className={cn(errors.price && "text-red-500")}>Precio de venta</Label>
+                                        <Input id="price" type="number" {...register("price", { valueAsNumber: true })} placeholder="0.00" className={cn(inputBaseClasses, errors.price && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")} />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Costo</Label>
-                                        <Input type="number" {...register("cost")} placeholder="0.00" className={inputBaseClasses}/>
+                                        <Label htmlFor="cost" className={cn(errors.cost && "text-red-500")}>Costo</Label>
+                                        <Input id="cost" type="number" {...register("cost", { valueAsNumber: true })} placeholder="0.00" className={cn(inputBaseClasses, errors.cost && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")} />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Stock mínimo</Label>
-                                        <Input type="number" {...register("minimum_stock")} placeholder="Ej: 10" className={inputBaseClasses}/>
+                                        <Label htmlFor="minimun_stock" className={cn(errors.minimum_stock && "text-red-500")}>Stock mínimo</Label>
+                                        <Input id="minimun_stock" type="number" {...register("minimum_stock", { valueAsNumber: true })} placeholder="Ej: 10" className={cn(inputBaseClasses, errors.minimum_stock && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")} />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Unidad de medida</Label>
-                                        <Input {...register("unit_of_measure")} placeholder="Ej: Unidad, Kg" className={inputBaseClasses}/>
+                                        <Label htmlFor="unit_of_measure" className={cn(errors.unit_of_measure && "text-red-500")}>Unidad de medida</Label>
+                                        <Input id="unit_of_measure" {...register("unit_of_measure")} placeholder="Ej: Unidad, Kg" className={cn(inputBaseClasses, errors.unit_of_measure && "border-red-500! focus-visible:ring-red-500! focus-visible:border-red-500!")} />
                                     </div>
                                 </div>
                             </section>
@@ -164,11 +247,8 @@ export default function CreateProductOnboardingPage() {
                                 </div>
                             </section>
 
-                            {/* Clasificación (placeholders) */}
+                            {/* Clasificación */}
                             <section className="space-y-6  dark:bg-slate-900/40 rounded-xl">
-                                {/* <h2 className="text-lg font-semibold text-ui-main dark:text-white">
-                                    Clasificación
-                                </h2> */}
                                 <div className="flex items-center gap-2">
                                     <span className="material-symbols-outlined text-ui-primary">
                                         category
@@ -182,18 +262,26 @@ export default function CreateProductOnboardingPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <Label>Categoría</Label>
-                                        <Input disabled placeholder="Seleccionada en el paso anterior" className={inputBaseClasses}/>
+                                        <Input
+                                            disabled
+                                            value={category?.name ?? ""}
+                                            className={inputBaseClasses}
+                                        />
                                     </div>
 
                                     <div className="space-y-2">
                                         <Label>Template</Label>
-                                        <Input disabled placeholder="Template asignado" className={inputBaseClasses}/>
+                                        <Input
+                                            disabled
+                                            value={template?.name ?? ""}
+                                            className={inputBaseClasses}
+                                        />
                                     </div>
                                 </div>
                             </section>
 
                             {/* Especificaciones (placeholders) */}
-                            <section className="space-y-6">
+                            {/* <section className="space-y-6">
                                 <div>
                                     <div className="flex items-center gap-2">
                                         <span className="material-symbols-outlined text-ui-primary dark:text-white">
@@ -211,12 +299,67 @@ export default function CreateProductOnboardingPage() {
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <Input disabled placeholder="Ej: Peso (KG)" className={inputBaseClasses}/>
-                                    <Input disabled placeholder="Ej: Requiere embalaje especial" className={inputBaseClasses}/>
-                                    <Input disabled placeholder="Ej: GSM" className={inputBaseClasses}/>
-                                    <Input disabled placeholder="Ej: Fecha de lanzamiento" className={inputBaseClasses}/>
+                                    <Input disabled placeholder="Ej: Peso (KG)" className={inputBaseClasses} />
+                                    <Input disabled placeholder="Ej: Requiere embalaje especial" className={inputBaseClasses} />
+                                    <Input disabled placeholder="Ej: GSM" className={inputBaseClasses} />
+                                    <Input disabled placeholder="Ej: Fecha de lanzamiento" className={inputBaseClasses} />
+                                </div>
+                            </section> */}
+                            <section className="space-y-6">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-ui-primary dark:text-white">
+                                            tune
+                                        </span>
+
+                                        <h2 className="text-lg font-semibold text-ui-main dark:text-white">
+                                            Especificaciones
+                                        </h2>
+                                    </div>
+
+                                    <p className="text-xs text-ui-secondary dark:text-slate-500">
+                                        Campos generados dinámicamente según el template.
+                                    </p>
+                                </div>
+
+                                {loadingAttributes && (
+                                    <p className="text-sm text-ui-secondary">
+                                        Cargando atributos del template...
+                                    </p>
+                                )}
+
+                                {!loadingAttributes && attributes.length === 0 && (
+                                    <p className="text-sm text-ui-secondary">
+                                        Este template no tiene atributos configurados.
+                                    </p>
+                                )}
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {attributes.map((attr) => (
+                                        <div key={attr.slug} className="space-y-2">
+                                            <Label>
+                                                {attr.name}
+                                                {/* {attr.is_required && (
+                                                    <span className="text-red-500 ml-1">*</span>
+                                                )} */}
+                                            </Label>
+
+                                            <Input
+                                                {...register(`specifications.${attr.slug}`)}
+                                                defaultValue={attr.default_value ?? ""}
+                                                placeholder={
+                                                    attr.unit_of_measure
+                                                        ? `${attr.name} (${attr.unit_of_measure})`
+                                                        : attr.description || attr.name
+                                                }
+                                                // required={attr.is_required}
+                                                className={inputBaseClasses}
+                                            />
+                                        </div>
+                                    ))}
                                 </div>
                             </section>
+
 
                             {/* Actions */}
                             <div className="flex flex-col-reverse sm:flex-row justify-between gap-4">
@@ -231,7 +374,7 @@ export default function CreateProductOnboardingPage() {
                                     type="submit"
                                     className="h-11 bg-ui-primary hover:bg-ui-primary-dark
                     text-white text-sm font-bold rounded-lg shadow-md
-                    flex items-center gap-2"
+                    flex items-center gap-2 cursor-pointer"
                                 >
                                     Crear producto
                                     <span className="material-symbols-outlined text-[18px]">

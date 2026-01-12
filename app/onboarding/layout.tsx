@@ -1,26 +1,29 @@
+import { OnboardingProvider } from "@/contexts/OnboardingContext"
+
 export default function OnboardingLayout({ children }: {
     children: React.ReactNode;
 }) {
     return (
+        <OnboardingProvider>
+            <div className="relative flex h-full min-h-screen w-full flex-col bg-gray-50 dark:bg-ui-dark justify-center items-center overflow-x-hidden p-4">
 
-        <div className="relative flex h-full min-h-screen w-full flex-col bg-gray-50 dark:bg-ui-dark justify-center items-center overflow-x-hidden p-4">
-
-            <div className="absolute top-8 left-8 hidden md:block">
-                <div className="flex items-center gap-2 cursor-default">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ui-primary text-white">
-                        <span className="material-symbols-outlined">inventory_2</span>
+                <div className="absolute top-8 left-8 hidden md:block">
+                    <div className="flex items-center gap-2 cursor-default">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ui-primary text-white">
+                            <span className="material-symbols-outlined">inventory_2</span>
+                        </div>
+                        <span className="text-lg font-bold tracking-tight text-ui-text-main">
+                            InventarioCL
+                        </span>
                     </div>
-                    <span className="text-lg font-bold tracking-tight text-ui-text-main">
-                        InventarioCL
-                    </span>
                 </div>
+
+                <main className="w-full max-w-160 animate-fade-in-up mt-0 md:mt-20">
+                    {children}
+                </main>
+
             </div>
-
-            <main className="w-full max-w-160 flex flex-col gap-6 animate-fade-in-up mt-0 md:mt-20">
-                {children}
-            </main>
-
-        </div>
+        </OnboardingProvider>
 
 
         //     <div

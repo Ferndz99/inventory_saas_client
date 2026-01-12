@@ -22,28 +22,129 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { AssignAttributeFormValues, assignAttributeSchema } from "@/schemas/onboarding.schema";
+import { onboardingService } from "@/services/onboardingService";
+import { useOnboarding } from "@/contexts/OnboardingContext";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function AssignAttributeForm() {
+
+    const { template } = useOnboarding()
+    const router = useRouter()
+    const [customAttributes, setCustomAttributes] = useState<any[]>([])
+    const [globalAttributes, setGlobalAttributes] = useState<any[]>([])
+    const [loadingAttributes, setLoadingAttributes] = useState(true)
+
+    useEffect(() => {
+        const loadAttributes = async () => {
+            try {
+                const [custom, global] = await Promise.all([
+                    onboardingService.getCustomAttributes(),
+                    onboardingService.getGlobalAttributes(),
+                ])
+
+                setCustomAttributes(custom.results)
+                setGlobalAttributes(global.results)
+            } catch (error) {
+                console.error(error)
+                toast.error("No se pudieron cargar los atributos")
+            } finally {
+                setLoadingAttributes(false)
+            }
+        }
+
+        loadAttributes()
+    }, [])
+
+
     const {
         control,
         register,
         handleSubmit,
         setValue,
         watch,
+        setError,
+        setFocus,
         formState: { errors, isSubmitting },
     } = useForm<AssignAttributeFormValues>({
         resolver: zodResolver(assignAttributeSchema),
         defaultValues: {
-            custom_attribute: null,
-            global_attribute: null,
+            custom_attribute: "",
+            global_attribute: "",
             is_required: true,
             order: 1,
-            default_value: null,
-        },
+            default_value: "",
+        }
     });
 
-    const onSubmit = (data: AssignAttributeFormValues) => {
-        console.log(data);
+    const selectedCustom = watch("custom_attribute")
+    const selectedGlobal = watch("global_attribute")
+
+    useEffect(() => {
+        if (selectedCustom) {
+            setValue("global_attribute", "")
+        }
+    }, [selectedCustom])
+
+    useEffect(() => {
+        if (selectedGlobal) {
+            setValue("custom_attribute", "")
+        }
+    }, [selectedGlobal])
+
+
+    const onSubmit = async (data: AssignAttributeFormValues) => {
+        console.log(template)
+        if (!template?.id) {
+            toast.error("No hay una plantilla activa")
+            return
+        }
+
+        if (!data.custom_attribute && !data.global_attribute) {
+            toast.error("Debes seleccionar un atributo")
+            return
+        }
+
+        try {
+            console.log(template)
+            await onboardingService.assignAttribute(template.id, {
+                custom_attribute: data.custom_attribute,
+                global_attribute: data.global_attribute,
+                is_required: data.is_required,
+                order: data.order,
+                default_value: data.default_value,
+            })
+
+            toast.success("Atributo asignado correctamente")
+            router.replace("/onboarding")
+
+        } catch (error: any) {
+            const apiError = error?.response?.data;
+            if (!apiError) return;
+
+            if (apiError.detail) {
+                setError("root", {
+                    type: "server",
+                    message: apiError.detail,
+                });
+            }
+
+            if (Array.isArray(apiError.errors) && apiError.errors.length > 0) {
+                const firstErrorField = apiError.errors[0].field;
+
+                apiError.errors.forEach(
+                    (error: { field: string; message: string }) => {
+                        setError(error.field as keyof AssignAttributeFormValues, {
+                            type: "server",
+                            message: error.message,
+                        });
+                    }
+                );
+
+                setFocus(firstErrorField as keyof AssignAttributeFormValues);
+            }
+        }
     };
 
     return (
@@ -80,22 +181,28 @@ export default function AssignAttributeForm() {
                                     name="custom_attribute"
                                     control={control}
                                     render={({ field }) => (
-                                        <Select
-                                            value={field.value?.toString() ?? ""}
-                                            onValueChange={(value) =>
-                                                field.onChange(Number(value))
-                                            }
+                                        <Select value={field.value}
+                                            onValueChange={field.onChange}>
 
-                                        >
                                             <SelectTrigger className="h-11 rounded-lg w-full">
                                                 <SelectValue placeholder="Selecciona un atributo personalizado" />
                                             </SelectTrigger>
+
                                             <SelectContent>
-                                                <SelectItem value="1">Material</SelectItem>
-                                                <SelectItem value="2">Color</SelectItem>
-                                                <SelectItem value="3">Tamaño</SelectItem>
+                                                {customAttributes.length === 0 && (
+                                                    <SelectItem disabled value="empty">
+                                                        No hay atributos personalizados
+                                                    </SelectItem>
+                                                )}
+
+                                                {customAttributes.map((attr) => (
+                                                    <SelectItem key={attr.id} value={attr.id.toString()}>
+                                                        {attr.name}
+                                                    </SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
+
                                     )}
                                 />
                             </div>
@@ -110,6 +217,7 @@ export default function AssignAttributeForm() {
                                 </span>
                             </div>
 
+
                             {/* Global attribute */}
                             <div className="space-y-2">
                                 <Label>Atributo global</Label>
@@ -117,21 +225,28 @@ export default function AssignAttributeForm() {
                                     name="global_attribute"
                                     control={control}
                                     render={({ field }) => (
-                                        <Select
-                                            value={field.value?.toString() ?? ""}
-                                            onValueChange={(value) =>
-                                                field.onChange(Number(value))
-                                            }
-                                        >
+                                        <Select value={field.value}
+                                            onValueChange={field.onChange}>
+
                                             <SelectTrigger className="h-11 rounded-lg w-full">
                                                 <SelectValue placeholder="Selecciona un atributo global" />
                                             </SelectTrigger>
+
                                             <SelectContent>
-                                                <SelectItem value="10">Peso</SelectItem>
-                                                <SelectItem value="11">Dimensiones</SelectItem>
-                                                <SelectItem value="12">Marca</SelectItem>
+                                                {globalAttributes.length === 0 && (
+                                                    <SelectItem disabled value="empty">
+                                                        No hay atributos globales
+                                                    </SelectItem>
+                                                )}
+
+                                                {globalAttributes.map((attr) => (
+                                                    <SelectItem key={attr.id} value={attr.id.toString()}>
+                                                        {attr.name}
+                                                    </SelectItem>
+                                                ))}
                                             </SelectContent>
                                         </Select>
+
                                     )}
                                 />
                             </div>
