@@ -23,6 +23,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { onboardingService } from "@/services/onboardingService";
 import { useOnboarding } from "@/contexts/OnboardingContext";
 import { buttonBaseClasses } from "@/lib/ui/input-classes";
+import { Controller } from "react-hook-form";
+
 
 
 
@@ -59,6 +61,7 @@ export default function CreateTemplatePage() {
         handleSubmit,
         setValue,
         watch,
+        control,
         formState: { errors, isSubmitting },
     } = useForm<TemplateFormValues>({
         resolver: zodResolver(templateSchema),
@@ -66,6 +69,7 @@ export default function CreateTemplatePage() {
             name: "",
             description: "",
             is_active: true,
+            selected_template_id: "",
         },
     });
 
@@ -73,6 +77,7 @@ export default function CreateTemplatePage() {
     const isActive = watch("is_active");
 
     const [mode, setMode] = useState<"create" | "select">("create")
+
 
 
     const onSubmit = async (data: TemplateFormValues) => {
@@ -87,8 +92,12 @@ export default function CreateTemplatePage() {
             }
 
             if (mode === "select") {
+                if (!data.selected_template_id) {
+                    throw new Error("No se seleccionó un template")
+                }
+
                 const template = templates.find(
-                    (t) => t.id === selectedTemplateId
+                    (t) => t.id === Number(data.selected_template_id)
                 )
 
                 if (!template) {
@@ -233,24 +242,32 @@ export default function CreateTemplatePage() {
                                     <Label>Selecciona un template</Label>
 
 
-                                    <Select
-                                        onValueChange={(value) => setSelectedTemplateId(Number(value))}
-                                    >
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Elige un template existente" />
-                                        </SelectTrigger>
+                                    <Controller
+                                        name="selected_template_id"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                value={field.value}
+                                                onValueChange={field.onChange}
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Elige un template existente" />
+                                                </SelectTrigger>
 
-                                        <SelectContent>
-                                            {templates.map((template) => (
-                                                <SelectItem
-                                                    key={template.id}
-                                                    value={template.id.toString()}
-                                                >
-                                                    {template.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                                <SelectContent>
+                                                    {templates.map((template) => (
+                                                        <SelectItem
+                                                            key={template.id}
+                                                            value={template.id.toString()}
+                                                        >
+                                                            {template.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        )}
+                                    />
+
 
                                     <p className="text-xs text-ui-secondary">
                                         Este template se usará para definir los atributos del producto.
@@ -263,10 +280,7 @@ export default function CreateTemplatePage() {
                             <div className="flex flex-col gap-4 mt-2">
                                 <Button
                                     type="submit"
-                                    disabled={
-                                        isSubmitting ||
-                                        (mode === "select" && !selectedTemplateId)
-                                    }
+                                    disabled={mode === "select" && !watch("selected_template_id")}
                                     className={cn(buttonBaseClasses)}
                                 >
                                     {mode === "create" ? "Crear template" : "Continuar"}

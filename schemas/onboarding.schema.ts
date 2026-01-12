@@ -31,6 +31,7 @@ export const templateSchema = z.object({
         .min(2, "El nombre debe tener al menos 2 caracteres"),
     description: z.string().optional(),
     is_active: z.boolean().default(true).optional(),
+    selected_template_id: z.string().optional(),
 });
 
 export type TemplateFormValues = z.infer<typeof templateSchema>;
@@ -49,19 +50,20 @@ export type AttributeFormValues = z.infer<typeof attributeSchema>;
 
 export const assignAttributeSchema = z
     .object({
-        custom_attribute: z.number().nullable(),
-        global_attribute: z.number().nullable(),
+        custom_attribute: z.string().optional(),
+        global_attribute: z.string().optional(),
         is_required: z.boolean(),
         order: z.number().int().min(1),
-        default_value: z.string().nullable(),
+        default_value: z.string().optional(),
     })
     .refine(
-        (data) => data.custom_attribute !== null || data.global_attribute !== null,
+        (data) =>
+            Boolean(data.custom_attribute) || Boolean(data.global_attribute),
         {
             message: "Debes seleccionar al menos un atributo personalizado o global",
             path: ["custom_attribute"],
         }
-    );
+    )
 
 export type AssignAttributeFormValues = z.infer<
     typeof assignAttributeSchema
