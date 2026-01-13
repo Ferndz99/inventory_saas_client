@@ -30,7 +30,7 @@ export function DashboardSidebar() {
     const { logout } = useAuth();
     const router = useRouter()
     return (
-        <Sidebar collapsible="icon">
+        <Sidebar collapsible="offcanvas" variant="inset">
             {/* Header */}
 
             <SidebarHeader>
