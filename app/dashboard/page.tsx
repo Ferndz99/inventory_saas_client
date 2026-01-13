@@ -1,25 +1,17 @@
 'use client'
 
+import ChartSection from "./components/ChartSection";
 import { InventoryKpiSection } from "./components/InventoryKpiSection";
 
-
-export interface InventoryValuationResponse {
-    total_value: number;
-    total_items: number;
-    generated_at: string;
-    by_warehouse: Record<string, {
-        warehouse_id: number;
-        products: number;
-        total_items: number;
-        total_value: number;
-    }>;
-}
 
 export default function page() {
 
     return (
         <>
-            <InventoryKpiSection/>
+            <div className="space-y-6">
+                <InventoryKpiSection />
+                <ChartSection />
+            </div>
         </>
     )
 }
