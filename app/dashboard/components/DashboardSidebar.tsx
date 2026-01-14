@@ -21,14 +21,19 @@ import {
     Users,
     LogOut,
     Menu,
+    FileStack,
 } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 export function DashboardSidebar() {
 
     const { logout } = useAuth();
-    const router = useRouter()
+    const pathname = usePathname()
+    const isActive = pathname === "/dashboard"
+    const isTemplateActive = pathname === "/plantillas" || pathname.startsWith("/plantillas/")
+
+
     return (
         <Sidebar collapsible="offcanvas" variant="inset">
             {/* Header */}
@@ -66,16 +71,20 @@ export function DashboardSidebar() {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton>
-                                    <LayoutDashboard />
-                                    <span>Dashboard</span>
+                                <SidebarMenuButton asChild isActive={isActive}>
+                                    <Link href="/dashboard">
+                                        <LayoutDashboard />
+                                        <span>Dashboard</span>
+                                    </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
 
                             <SidebarMenuItem>
-                                <SidebarMenuButton>
-                                    <Package />
-                                    <span>Productos</span>
+                                <SidebarMenuButton asChild isActive={isTemplateActive}>
+                                    <Link href="/plantillas">
+                                        <FileStack />
+                                        <span>Plantillas</span>
+                                    </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
 
