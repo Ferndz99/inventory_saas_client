@@ -15,6 +15,19 @@ import {
 import { useAuth } from "@/contexts/AuthContext"
 
 import {
+    Collapsible,
+    CollapsibleTrigger,
+    CollapsibleContent,
+} from "@/components/ui/collapsible"
+
+import {
+    SidebarMenuSub,
+    SidebarMenuSubItem,
+} from "@/components/ui/sidebar"
+
+import { ChevronRight } from "lucide-react"
+
+import {
     LayoutDashboard,
     Package,
     ShoppingCart,
@@ -31,7 +44,8 @@ export function DashboardSidebar() {
     const { logout } = useAuth();
     const pathname = usePathname()
     const isActive = pathname === "/dashboard"
-    const isTemplateActive = pathname === "/plantillas" || pathname.startsWith("/plantillas/")
+    const isTemplatesRoute = pathname.startsWith("/dashboard/templates")
+
 
 
     return (
@@ -79,14 +93,56 @@ export function DashboardSidebar() {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
 
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild isActive={isTemplateActive}>
-                                    <Link href="/plantillas">
-                                        <FileStack />
-                                        <span>Plantillas</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
+                            <Collapsible
+                                defaultOpen={isTemplatesRoute}
+                                className="group/collapsible"
+                            >
+                                <SidebarMenuItem>
+                                    {/* Trigger */}
+                                    <CollapsibleTrigger asChild>
+                                        <SidebarMenuButton isActive={isTemplatesRoute}>
+                                            <FileStack />
+                                            <span>Plantillas</span>
+
+                                            {/* Flecha */}
+                                            <ChevronRight
+                                                className="
+            ml-auto h-4 w-4 transition-transform
+            group-data-[state=open]/collapsible:rotate-90
+          "
+                                            />
+                                        </SidebarMenuButton>
+                                    </CollapsibleTrigger>
+
+                                    {/* Contenido */}
+                                    <CollapsibleContent>
+                                        <SidebarMenuSub>
+                                            <SidebarMenuSubItem>
+                                                <SidebarMenuButton
+                                                    asChild
+                                                    isActive={pathname === "/dashboard/templates"}
+                                                >
+                                                    <Link href="/dashboard/templates">
+                                                        <span>Ver plantillas</span>
+                                                    </Link>
+                                                </SidebarMenuButton>
+                                            </SidebarMenuSubItem>
+
+                                            <SidebarMenuSubItem>
+                                                <SidebarMenuButton
+                                                    asChild
+                                                    isActive={pathname === "/dashboard/templates/create"}
+                                                >
+                                                    <Link href="/dashboard/templates/create">
+                                                        <span>Crear plantilla</span>
+                                                    </Link>
+                                                </SidebarMenuButton>
+                                            </SidebarMenuSubItem>
+                                        </SidebarMenuSub>
+                                    </CollapsibleContent>
+                                </SidebarMenuItem>
+                            </Collapsible>
+
 
                             <SidebarMenuItem>
                                 <SidebarMenuButton>
