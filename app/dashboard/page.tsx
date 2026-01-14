@@ -1,11 +1,9 @@
 'use client'
 
-import { useEffect, useState } from "react";
 import ChartSection from "./components/ChartSection";
 import { InventoryKpiSection } from "./components/InventoryKpiSection";
-import { dashBoardService } from "@/services/dashboardService";
-import { TopProduct, TopProductMetric, TopProductsResponse, TopProductsTable } from "./components/table/TopProductsTable";
 import TableSection from "./components/TableSection";
+import RecentSection from "./components/RecentSection";
 
 
 export default function page() {
@@ -18,6 +16,7 @@ export default function page() {
                 <InventoryKpiSection />
                 <ChartSection />
                 <TableSection/>
+                <RecentSection/>
             </div>
         </>
     )

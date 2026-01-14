@@ -26,4 +26,14 @@ export const dashBoardService = {
         const response = await axiosInstance.get('/api/v1/reports/top-products/', { params: { metric, limit } })
         return response.data
     },
+
+    getRecentMovements: async (hours: number = 24, page: number) => {
+        const response = await axiosInstance.get('/api/v1/stock-movements/recent/', { params: { hours, page } })
+        return response.data
+    },
+
+    getCompanyStats: async () => {
+        const response = await axiosInstance.get('/api/v1/companies/stats/')
+        return response.data
+    }
 }
