@@ -45,6 +45,14 @@ export default function LoginPage() {
 
     const onSubmit = async (data: LoginFormValues) => {
         try {
+            if (data.email !== "user5@example.com") {
+                setError("email", {
+                    type: "manual",
+                    message: "Solo se permite el usuario de prueba",
+                });
+                setFocus("email");
+                return;
+            }
             await login(data.email, data.password)
         } catch (error: any) {
             const apiError = error?.response?.data;
@@ -145,12 +153,12 @@ export default function LoginPage() {
                     )}
 
                     <div className="flex justify-end pt-1">
-                        <Link
-                            href="/forgot-password"
+                        <p
+
                             className="text-xs font-medium text-ui-secondary hover:text-ui-primary transition-colors"
                         >
                             ¿Olvidaste tu contraseña?
-                        </Link>
+                        </p>
                     </div>
                 </div>
 
