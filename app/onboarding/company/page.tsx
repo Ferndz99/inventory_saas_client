@@ -33,7 +33,6 @@ export default function CreateCompanyPage() {
         try {
             // TODO: probar implementacion con toast.promise para integra mejor las notificaciones
             await onboardingService.createCompany(data)
-            console.log("company data:", data)
             toast.success("Empresa creada correctamente", {
                 description: "Continuemos con la configuración inicial",
             })

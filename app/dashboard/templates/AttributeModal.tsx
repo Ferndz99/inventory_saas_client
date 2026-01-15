@@ -89,7 +89,6 @@ export function AttributeModal({
             // Asumiendo que tienes un método para obtener atributos
             const attributes = await onboardingService.getCustomAttributes();
             // setCustomAttributes(attributes);
-            console.log("custom", attributes)
             setCustomAttributes(attributes.results);
         } catch (error) {
             console.error("Error al cargar atributos:", error);
@@ -100,7 +99,6 @@ export function AttributeModal({
         try {
             // Asumiendo que tienes un método para obtener atributos
             const globalAttributes = await onboardingService.getGlobalAttributes();
-            console.log("global", globalAttributes)
             // setCustomAttributes(attributes);
             setGlobalAttributes(globalAttributes.results);
         } catch (error) {

@@ -88,7 +88,6 @@ export default function TemplateCreatePage() {
         if (template) return;
         try {
             const res = await onboardingService.createTemplate(data)
-            console.log(res)
             setTemplate(res);
             setTemplateAttributes(res.template_attributes ?? [])
         } catch (error: any) {

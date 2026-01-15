@@ -49,14 +49,12 @@ export default function ResetPasswordConfirmPage() {
         const objRequest: requestResetPasswordConfirm = { ...data, uid, token }
 
         try {
-            console.log(objRequest)
             await authService.confirmPasswordReset(objRequest)
             toast.success("contraseña recuperada")
             router.replace("/login")
         } catch (error: any) {
             const apiError = error?.response?.data;
             if (!apiError) return;
-            console.log(apiError)
 
             if (apiError.detail) {
                 setError("root", {

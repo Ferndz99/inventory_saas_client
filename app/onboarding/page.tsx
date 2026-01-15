@@ -89,7 +89,6 @@ export default function OnboardingPage() {
         getOnboarding()
     }, [])
 
-    console.log(onboarding)
     if (!onboarding) return null
 
     const steps = onboarding

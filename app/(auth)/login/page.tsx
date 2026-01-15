@@ -44,7 +44,6 @@ export default function LoginPage() {
     }
 
     const onSubmit = async (data: LoginFormValues) => {
-        console.log("Login data:", data);
         try {
             await login(data.email, data.password)
         } catch (error: any) {

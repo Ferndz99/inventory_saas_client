@@ -42,7 +42,6 @@ export default function RegisterForm() {
     }
 
     const onSubmit = async (data: RegisterFormValues) => {
-        console.log("Register data:", data);
         try {
             await authService.register(data)
             router.push("/login")

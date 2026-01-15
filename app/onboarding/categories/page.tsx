@@ -43,7 +43,6 @@ export default function OnboardingPage() {
 
     const onSubmit = async (data: CreateCategoryForm) => {
         try {
-            console.log("CREATE CATEGORY", data);
             const category = await onboardingService.createCategory(data)
             toast.success("Categoría creada correctamente")
             setCategory({

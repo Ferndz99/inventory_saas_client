@@ -45,7 +45,6 @@ export default function CreateTemplatePage() {
         const loadTemplates = async () => {
             try {
                 const data = await onboardingService.getTemplates()
-                console.log(data)
                 setTemplates(data.results)
             } catch (error) {
                 console.error("Error loading templates", error)
