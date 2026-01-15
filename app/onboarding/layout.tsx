@@ -1,8 +1,27 @@
+"use client";
+
+import { useAuth, useRequireAuth } from "@/contexts/AuthContext";
 import { OnboardingProvider } from "@/contexts/OnboardingContext"
 
 export default function OnboardingLayout({ children }: {
     children: React.ReactNode;
 }) {
+
+    const { loading, isReady } = useRequireAuth({ redirectTo: "/login" });
+
+    if (loading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <p>Cargando...</p>
+            </div>
+        );
+    }
+
+    if (!isReady) {
+        return null;
+    }
+
+
     return (
         <OnboardingProvider>
             <div className="relative flex h-full min-h-screen w-full flex-col bg-gray-50 dark:bg-ui-dark justify-center items-center overflow-x-hidden p-4">
