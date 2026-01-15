@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormValues, loginSchema } from "@/schemas/auth.schema";
@@ -12,6 +12,7 @@ import { buttonBaseClasses, inputBaseClasses } from "@/lib/ui/input-classes";
 import { authService } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useAuth, useRedirectIfAuthenticated } from "@/contexts/AuthContext";
 
 
 
@@ -28,11 +29,24 @@ export default function LoginPage() {
 
     const [showPassword, setShowPassword] = useState(false);
 
+    const { loading: redirectLoading } = useRedirectIfAuthenticated("/workspace");
+
+    const { login } = useAuth();
+
+    if (redirectLoading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <span className="material-symbols-outlined animate-spin">
+                    progress_activity
+                </span>
+            </div>
+        );
+    }
+
     const onSubmit = async (data: LoginFormValues) => {
         console.log("Login data:", data);
         try {
-            await authService.login(data)
-            router.replace("/workspace")
+            await login(data.email, data.password)
         } catch (error: any) {
             const apiError = error?.response?.data;
             if (!apiError) return;
