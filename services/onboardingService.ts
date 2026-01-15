@@ -18,8 +18,8 @@ export const onboardingService = {
         return response.data
     },
 
-    getTemplates: async () => {
-        const response = await axiosInstance.get('/api/v1/templates/')
+    getTemplates: async (page?: number, page_size?: number, ordering?: string) => {
+        const response = await axiosInstance.get('/api/v1/templates/', { params: { page, page_size, ordering } })
         return response.data
     },
 
