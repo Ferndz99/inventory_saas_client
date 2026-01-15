@@ -184,7 +184,7 @@ export default function OnboardingPage() {
                 })}
             </div>
 
-            <OnboardingDebug />
+            {/* <OnboardingDebug /> */}
         </div>
     )
 }
