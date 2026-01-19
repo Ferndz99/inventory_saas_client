@@ -45,6 +45,14 @@ export default function LoginPage() {
 
     const onSubmit = async (data: LoginFormValues) => {
         try {
+            if (data.email !== "user5@example.com") {
+                setError("email", {
+                    type: "manual",
+                    message: "Solo se permite el usuario de prueba",
+                });
+                setFocus("email");
+                return;
+            }
             await login(data.email, data.password)
         } catch (error: any) {
             const apiError = error?.response?.data;
@@ -145,12 +153,12 @@ export default function LoginPage() {
                     )}
 
                     <div className="flex justify-end pt-1">
-                        <Link
-                            href="/forgot-password"
+                        <p
+
                             className="text-xs font-medium text-ui-secondary hover:text-ui-primary transition-colors"
                         >
                             ¿Olvidaste tu contraseña?
-                        </Link>
+                        </p>
                     </div>
                 </div>
 
@@ -200,13 +208,13 @@ export default function LoginPage() {
             {/* Register */}
             <div className="mt-8 text-center">
                 <p className="text-sm text-ui-secondary cursor-default">
-                    ¿No tienes una cuenta?
-                    <Link
+                    ¿No tienes una cuenta?, Registrate
+                    {/* <Link
                         href="/register"
                         className="ml-1 font-medium text-ui-primary hover:text-ui-primary-dark transition-colors"
                     >
                         Regístrate
-                    </Link>
+                    </Link>*/}
                 </p>
             </div>
         </>
