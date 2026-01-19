@@ -208,13 +208,13 @@ export default function LoginPage() {
             {/* Register */}
             <div className="mt-8 text-center">
                 <p className="text-sm text-ui-secondary cursor-default">
-                    ¿No tienes una cuenta?
-                    <Link
+                    ¿No tienes una cuenta?, Registrate
+                    {/* <Link
                         href="/register"
                         className="ml-1 font-medium text-ui-primary hover:text-ui-primary-dark transition-colors"
                     >
                         Regístrate
-                    </Link>
+                    </Link> */}
                 </p>
             </div>
         </>
