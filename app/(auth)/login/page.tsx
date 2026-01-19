@@ -214,7 +214,7 @@ export default function LoginPage() {
                         className="ml-1 font-medium text-ui-primary hover:text-ui-primary-dark transition-colors"
                     >
                         Regístrate
-                    </Link> */}
+                    </Link>*/}
                 </p>
             </div>
         </>
